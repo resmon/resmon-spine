@@ -36,3 +36,6 @@ extern void poll_host(int host_id, int host_thread, int last_host_thread, int ho
 extern char *exec_poll(host_t *current_host, char *command);
 extern int is_multipart_output(char *result);
 extern int validate_result(char *result);
+/* modify for multi user start */
+extern char *update_cur_time(char *poll_result, host_t *host, ping_t *ping, double total_time);
+/* modify for multi user end */

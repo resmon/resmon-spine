@@ -159,6 +159,10 @@ void poll_host(int host_id, int host_thread, int last_host_thread, int host_data
 	int perform_assert          = TRUE;
 	int new_buffer              = TRUE;
 
+	/* modify for multi user start */
+	double begin_time, end_time;
+	char *update_sql_ptr;
+	/* modify for multi user end */
 	reindex_t   *reindex;
 	host_t      *host;
 	ping_t      *ping;
@@ -619,13 +623,29 @@ void poll_host(int host_id, int host_thread, int last_host_thread, int host_data
 
 							break;
 						case POLLER_ACTION_SCRIPT: /* script (popen) */
+							/* modify for multi user start */
+							begin_time = get_time_as_double();	/* record start time */
 							poll_result = trim(exec_poll(host, reindex->arg1));
+							end_time = get_time_as_double();	/* record end time */
+							if (host_thread == 1) {
+								update_sql_ptr = update_cur_time(poll_result, host, ping, (end_time - begin_time));
+								db_insert(&mysql, update_sql_ptr);
+							}
+							/* modify for multi user end */
 							SPINE_LOG_MEDIUM(("Host[%i] TH[%i] Recache DataQuery[%i] CMD: %s, output: %s", host->id, host_thread, reindex->data_query_id, reindex->arg1, poll_result));
 
 							break;
 						case POLLER_ACTION_PHP_SCRIPT_SERVER: /* script (php script server) */
+							/* modify for multi user start */
 							php_process = php_get_process();
+							begin_time = get_time_as_double();	/* record start time */
 							poll_result = trim(php_cmd(reindex->arg1, php_process));
+							end_time = get_time_as_double();	/* record end time */
+							if (host_thread == 1) {
+								update_sql_ptr = update_cur_time(poll_result, host, ping, (end_time - begin_time));
+								db_insert(&mysql, update_sql_ptr);
+							}
+							/* modify for multi user end */
 							SPINE_LOG_MEDIUM(("Host[%i] TH[%i] Recache DataQuery[%i] SERVER: %s, output: %s", host->id, host_thread, reindex->data_query_id, reindex->arg1, poll_result));
 
 							break;
@@ -1015,7 +1035,15 @@ void poll_host(int host_id, int host_thread, int last_host_thread, int host_data
 
 				break;
 			case POLLER_ACTION_SCRIPT: /* execute script file */
+				/* modify for multi user start */
+				begin_time = get_time_as_double();	/* record start time */
 				poll_result = exec_poll(host, poller_items[i].arg1);
+				end_time = get_time_as_double();	/* record end time */
+				if (host_thread == 1) {
+					update_sql_ptr = update_cur_time(poll_result, host, ping, (end_time - begin_time));
+					db_insert(&mysql, update_sql_ptr);
+				}
+				/* modify for multi user end */
 
 				/* process the result */
 				if (IS_UNDEFINED(poll_result)) {
@@ -1049,8 +1077,15 @@ void poll_host(int host_id, int host_thread, int last_host_thread, int host_data
 				break;
 			case POLLER_ACTION_PHP_SCRIPT_SERVER: /* execute script server */
 				php_process = php_get_process();
-
+				/* modify for multi user start */
+				begin_time = get_time_as_double();	/* record start time */
 				poll_result = php_cmd(poller_items[i].arg1, php_process);
+				end_time = get_time_as_double();	/* record end time */
+				if (host_thread == 1) {
+					update_sql_ptr = update_cur_time(poll_result, host, ping, (end_time - begin_time));
+					db_insert(&mysql, update_sql_ptr);
+				}
+				/* modify for multi user end */
 
 				/* process the output */
 				if (IS_UNDEFINED(poll_result)) {
@@ -1505,3 +1540,46 @@ char *exec_poll(host_t *current_host, char *command) {
 
 	return result_string;
 }
+/* modify for multi user start */
+char *update_cur_time(char *poll_result, host_t *host, ping_t *ping, double total_time) {
+	char *result_string;
+
+	/* printf("******** [%i][%i][%s][%s %f %f] ********\n", IS_UNDEFINED(poll_result), host->id, host->hostname, ping->ping_status, host->cur_time, total_time); */
+	snprintf(ping->ping_status, 50, "%.5f", host->cur_time + total_time);
+
+	if (IS_UNDEFINED(poll_result)) {
+		update_host_status(HOST_DOWN, host, ping, -1);
+	} else {
+		update_host_status(HOST_UP, host, ping, -1);
+	}
+
+	if (!(result_string = (char *) malloc(BUFSIZE))) {
+		die("ERROR: Fatal malloc error: poller.c update_cur_time!");
+	}
+	memset(result_string, 0, BUFSIZE);
+
+	snprintf(result_string, BUFSIZE, "UPDATE host "
+		"SET status='%i', status_event_count='%i', status_fail_date='%s',"
+			" status_rec_date='%s', status_last_error='%s', min_time='%f',"
+			" max_time='%f', cur_time='%f', avg_time='%f', total_polls='%i',"
+			" failed_polls='%i', availability='%.4f' "
+		"WHERE id='%i'",
+		host->status,
+		host->status_event_count,
+		host->status_fail_date,
+		host->status_rec_date,
+		host->status_last_error,
+		host->min_time,
+		host->max_time,
+		host->cur_time,
+		host->avg_time,
+		host->total_polls,
+		host->failed_polls,
+		host->availability,
+		host->id);
+
+	/* printf("######## [%s] ########\n", result_string); */
+
+	return result_string;
+}
+/* modify for multi user end */
