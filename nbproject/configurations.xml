@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="80">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df name="cacti-spine-0.8.7i" root=".">
+      <df name="autom4te.cache">
+        <in>output.0</in>
+        <in>output.1</in>
+        <in>requests</in>
+        <in>traces.0</in>
+        <in>traces.1</in>
+      </df>
+      <df name="config">
+        <in>config.guess</in>
+        <in>config.h.in</in>
+        <in>config.sub</in>
+        <in>depcomp</in>
+        <in>install-sh</in>
+        <in>ltmain.sh</in>
+        <in>missing</in>
+      </df>
+      <in>AUTHORS</in>
+      <in>COPYING</in>
+      <in>ChangeLog</in>
+      <in>INSTALL</in>
+      <in>LICENSE</in>
+      <in>LICENSE.LGPL</in>
+      <in>Makefile.am</in>
+      <in>Makefile.in</in>
+      <in>NEWS</in>
+      <in>README</in>
+      <in>README-WINDOWS</in>
+      <in>aclocal.m4</in>
+      <in>bootstrap</in>
+      <in>common.h</in>
+      <in>configure</in>
+      <in>configure.ac</in>
+      <in>error.c</in>
+      <in>error.h</in>
+      <in>keywords.c</in>
+      <in>keywords.h</in>
+      <in>locks.c</in>
+      <in>locks.h</in>
+      <in>nft_popen.c</in>
+      <in>nft_popen.h</in>
+      <in>package</in>
+      <in>php.c</in>
+      <in>php.h</in>
+      <in>ping.c</in>
+      <in>ping.h</in>
+      <in>poller.c</in>
+      <in>poller.h</in>
+      <in>snmp.c</in>
+      <in>snmp.h</in>
+      <in>spine.c</in>
+      <in>spine.conf.dist</in>
+      <in>spine.h</in>
+      <in>sql.c</in>
+      <in>sql.h</in>
+      <in>util.c</in>
+      <in>util.h</in>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="重要なファイル"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+      <itemPath>configure</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>None|Unknown</compilerSet>
+      </toolsSet>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+      </makefileType>
+    </conf>
+  </confs>
+</configurationDescriptor>
